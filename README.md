@@ -1,8 +1,8 @@
 # 🚀 PHP Hosting with Automatic HTTPS
 
-This template provides a straightforward solution for PHP hosting with automatic HTTPS. Key features include:
+This template and script provides a straightforward solution for PHP hosting with automatic HTTPS. Key features include:
 
-1. ⚡ Quick Setup: Rapidly deploy a PHP environment.
+1. ⚡ Quick Setup: Rapidly deploy a PHP environment with a single script `ship.sh`.
 2. 🔒 Automatic HTTPS: Secure sites using Caddy and Cloudflare DNS.
 3. 🐳 Docker-Based: Utilize containerization for flexibility.
 4. 🛠️ Simplified Configuration: Automatic HTTPS reduces manual certificate management.
@@ -27,47 +27,55 @@ For individual developers and small teams, this solution offers an accessible wa
 - A system running Ubuntu (or another supported Linux distribution)
 - A Cloudflare account with an API token for DNS verification
 
-### Installing Docker and Docker Compose
+## Quick Start
 
-If you don't have Docker and Docker Compose installed, you can easily set them up on Ubuntu using the following steps:
+We've provided a convenient setup script `ship.sh` to quickly get you started. This script will:
 
-1. Update your existing list of packages:
-   ```bash
-   sudo apt update
-   ```
+1. Guide you through creating a Cloudflare API token
+2. Provide instructions for setting up DNS records
+3. Install Docker if it's not already installed
+4. Set up the necessary environment variables
+5. Start the Docker containers
 
-2. Install a few prerequisite packages which let apt use packages over HTTPS:
-   ```bash
-   sudo apt install apt-transport-https ca-certificates curl software-properties-common
-   ```
+To use the script:
 
-3. Download and run the official Docker installation script:
-   ```bash
-   curl -fsSL https://get.docker.com -o get-docker.sh
-   sudo sh get-docker.sh
-   ```
-
-4. Add your user to the docker group to run Docker commands without sudo:
-   ```bash
-   sudo usermod -aG docker $USER
-   ```
-
-7. Log out and log back in for the group changes to take effect.
-
-## Setup
-
-1. Clone this repository to your local machine or VPS:
+1. Clone this repository:
    ```bash
    git clone https://github.com/koenvaneijk/php-vps
    cd php-vps
    ```
 
-2. Create a `.env` file in the root directory and add your Cloudflare API token:
-   ```
-   CLOUDFLARE_API_TOKEN=your_cloudflare_api_token_here
+2. Make the script executable:
+   ```bash
+   chmod +x ship.sh
    ```
 
-3. Modify the `Caddyfile` to include your domain(s):
+3. Run the script:
+   ```bash
+   ./ship.sh
+   ```
+
+4. Follow the on-screen instructions to complete the setup.
+
+## Manual Setup
+
+If you prefer to set things up manually, follow these steps:
+
+1. Ensure Docker and Docker Compose are installed on your system.
+
+2. Clone this repository:
+   ```bash
+   git clone https://github.com/koenvaneijk/php-vps
+   cd php-vps
+   ```
+
+3. Create a `.env` file in the root directory and add your Cloudflare API token:
+   ```
+   CLOUDFLARE_API_TOKEN=your_cloudflare_api_token_here
+   DOMAINS=example.com,example.net
+   ```
+
+4. Modify the `Caddyfile` to include your domain(s):
    ```
    example.com {
        root * /srv/example.com/public
@@ -76,7 +84,7 @@ If you don't have Docker and Docker Compose installed, you can easily set them u
    }
    ```
 
-4. Place your PHP files in the `sites` directory. The structure should be:
+5. Place your PHP files in the `sites` directory. The structure should be:
    ```
    sites/
    ├── example.com/
@@ -87,98 +95,24 @@ If you don't have Docker and Docker Compose installed, you can easily set them u
            └── index.php
    ```
 
-5. If needed, customize the PHP extensions in `php/Dockerfile`.
+6. Start the containers:
+   ```bash
+   docker compose up -d
+   ```
 
 ## Usage
 
-1. Start the containers:
-   ```bash
-   docker compose up -d
-   ```
+To add a new site:
+- Create a new directory in the `sites` folder with your domain name
+- Add your PHP files to the `public` subdirectory inside that folder
 
-3. To add a new site:
-   - Create a new directory in the `sites` folder with your domain name (or including subdomain e.g. subdomain.example.com or example.com)
-   - Add your PHP files to the `public` subdirectory inside that folder
+To add a new domain:
+- Edit the .env and add the domain
+- Restart Caddy with `docker restart caddy`
 
-4. To add a new domain:
-    - Edit the Caddyfile and add the domain
-    - Restart caddy with `docker restart caddy`
 
-2. Your PHP applications should now be accessible at their respective domains.
 
-## Updates and Maintenance
-
-### Updating Docker Containers
-
-To update your Docker containers with the latest images and configurations:
-
-1. Pull the latest changes from the repository:
-   ```bash
-   git pull origin main
-   ```
-
-2. Rebuild and restart the containers:
-   ```bash
-   docker compose down
-   docker compose build --no-cache
-   docker compose up -d
-   ```
-
-This process will ensure you have the latest versions of Caddy, PHP, and any other dependencies defined in the Dockerfiles.
-
-### Installing System Updates
-
-To keep the host system updated:
-
-1. Update the package list:
-   ```bash
-   sudo apt update
-   ```
-
-2. Upgrade installed packages:
-   ```bash
-   sudo apt upgrade -y
-   ```
-
-3. Remove unnecessary packages:
-   ```bash
-   sudo apt autoremove -y
-   ```
-
-4. Reboot the system if required (e.g., after kernel updates):
-   ```bash
-   sudo reboot
-   ```
-
-### Updating PHP Version
-
-To update the PHP version:
-
-1. Modify the `php/Dockerfile` to use the desired PHP version.
-2. Rebuild the PHP container:
-   ```bash
-   docker compose build --no-cache php-fpm
-   docker compose up -d php-fpm
-   ```
-
-Remember to test your applications thoroughly after updating PHP, as newer versions may introduce breaking changes.
-
-### Backup Before Updating
-
-It's always a good practice to backup your data before performing updates:
-
-1. Backup your sites directory:
-   ```bash
-   tar -czvf sites_backup.tar.gz sites
-   ```
-
-2. Backup your Docker volumes:
-   ```bash
-   docker run --rm -v php-vps_caddy_data:/data -v $(pwd):/backup alpine tar -czvf /backup/caddy_data_backup.tar.gz /data
-   docker run --rm -v php-vps_caddy_config:/config -v $(pwd):/backup alpine tar -czvf /backup/caddy_config_backup.tar.gz /config
-   ```
-
-By following these update and maintenance procedures, you can ensure your PHP hosting environment remains secure, up-to-date, and running smoothly!
+## License
 
 ## License
 

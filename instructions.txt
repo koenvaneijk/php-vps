@@ -1,0 +1,183 @@
+# Simple PHP Vanilla App Development Guide
+
+## General Instructions
+- Choose a simple, descriptive name for your app (e.g., 'calendar', 'notes', 'tasks'). Use this name consistently in page titles and headers.
+- Maintain a minimalistic design aesthetic:
+  - Use lowercase text throughout the app for a clean look.
+  - Prioritize a clean, intuitive user interface with exceptional user experience.
+  - Use placeholders instead of separate labels for input fields where appropriate.
+  - Prefer icons (Bootstrap-Icons) or even use emojis over text (e.g., a trash icon for delete functionality or a calendar icon for date selection). 
+
+## Project Structure
+Keep the structure as simple as possible:
+```
+project_root/
+├── app.db (SQLite database)
+└── public/
+    ├── index.php
+    ├── styles.css (Tailwind CSS output)
+    └── main.js (JavaScript/jQuery code)
+```
+
+## PHP Guidelines
+- Use PHP 7.4+ features for improved type safety and readability.
+- Implement basic error handling.
+- Keep all logic in `index.php` for simplicity.
+- Use SQLite for database operations with prepared statements to prevent SQL injection.
+
+## HTML and Templating
+- Use semantic HTML5 elements.
+- Inline PHP with HTML in `index.php` for simplicity.
+- Sanitize all user inputs and escape output to prevent XSS attacks.
+
+## jQuery Usage
+- Use jQuery for DOM manipulation and AJAX requests.
+- Implement event handling for dynamic elements.
+- Use jQuery's `$.ajax()` for asynchronous data fetching and updates.
+
+## Tailwind CSS
+- Utilize Tailwind CSS for styling:
+  - Use utility classes extensively to style elements.
+  - Include Tailwind CSS via CDN for development.
+- Avoid writing custom CSS unless absolutely necessary.
+- Follow user's system preference for dark mode styling
+
+## User Interface
+- Design for responsiveness using Tailwind's responsive utility classes.
+- Use Tailwind's built-in components for UI elements.
+- Implement modals using Tailwind CSS classes.
+- The footer should be rather muted, not very prominently visible.
+
+
+## Authentication
+- Use Google Sign-In for user authentication. Put placeholder values for the client ID and API key in `index.php`.
+
+Add the Google Sign-In library to your HTML file:
+
+```html
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+```
+
+## 3. Configure Google Sign-In Button
+
+Add a container for the Google Sign-In button in your HTML:
+
+```html
+<div id="g_id_onload"
+     data-client_id="YOUR_CLIENT_ID"
+     data-callback="handleCredentialResponse">
+</div>
+<div class="g_id_signin" data-type="standard"></div>
+```
+
+## 4. Handle the Sign-In Response
+
+Create a JavaScript function to handle the sign-in response:
+
+```javascript
+function handleCredentialResponse(response) {
+    var credential = response.credential;
+    var decodedToken = JSON.parse(atob(credential.split('.')[1]));
+
+    // Send the user info to your server
+    $.post('your_server_endpoint.php', {
+        googleSignIn: true,
+        email: decodedToken.email,
+        name: decodedToken.name
+    }, function(response) {
+        // Handle the server response
+        if (response.success) {
+            location.reload(); // Reload the page or update UI as needed
+        } else {
+            console.error('Sign-in failed:', response.message);
+        }
+    });
+}
+```
+
+## 5. Server-side Handling (PHP example)
+
+On your server, handle the sign-in data:
+
+```php
+<?php
+session_start();
+$db = new SQLite3('your_database.db');
+
+if (isset($_POST['googleSignIn'])) {
+    $email = $_POST['email'];
+    $name = $_POST['name'];
+
+    // Insert or update user in database
+    $stmt = $db->prepare('INSERT OR IGNORE INTO users (email, name) VALUES (:email, :name)');
+    $stmt->bindValue(':email', $email, SQLITE3_TEXT);
+    $stmt->bindValue(':name', $name, SQLITE3_TEXT);
+    $stmt->execute();
+
+    // Set session variables
+    $_SESSION['user_id'] = $db->lastInsertRowID();
+    $_SESSION['user_name'] = $name;
+
+    echo json_encode(['success' => true]);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Invalid request']);
+}
+?>
+```
+
+## 6. Implement Sign-Out
+
+Add a sign-out button to your HTML:
+
+```html
+<a href="?signout=1" class="signout-button">Sign out</a>
+```
+
+Handle sign-out on the server:
+
+```php
+if (isset($_GET['signout'])) {
+    session_destroy();
+    header('Location: index.php');
+    exit();
+}
+```
+
+## 7. Protect Content
+
+Use session variables to determine if a user is signed in:
+
+```php
+<?php if (!isset($_SESSION['user_id'])): ?>
+    <!-- Show sign-in button -->
+<?php else: ?>
+    <!-- Show user-specific content -->
+    <p>Welcome, <?php echo $_SESSION['user_name']; ?></p>
+    <!-- Rest of your app content -->
+<?php endif; ?>
+```
+
+## 8. Error Handling and Security
+
+- Validate and sanitize all user inputs on the server-side.
+- Use prepared statements for database queries to prevent SQL injection.
+- Implement CSRF protection for form submissions.
+- Use HTTPS to encrypt data in transit.
+
+## Database
+- Use SQLite for the database.
+- Create tables and perform queries directly in `index.php`.
+
+## Security
+- Follow basic OWASP guidelines for web application security.
+- Implement proper input validation and sanitization.
+
+Remember to keep your code simple and avoid unnecessary abstractions. Focus on creating a functional application with clean, readable code.
+
+
+## Approach
+
+1. Start by analyzing the requirements of your app. If the description is too vague, make a list of suggested features or think about similar apps you've used and what you liked about them.
+2. Write out a basic plan. Think from the user's perspective and design the app accordingly. 
+3. Deliver an MVP (Minimum Viable Product) and add critical features first.
+4. Provide the full code, don't leave things out as a comment, implement it!

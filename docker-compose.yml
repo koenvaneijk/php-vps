@@ -1,0 +1,40 @@
+services:
+  caddy:
+    build: ./caddy
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy_data:/data
+      - ./caddy_config:/config
+      - ./sites:/srv
+    networks:
+      - appnetwork
+    environment:
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - DOMAINS=${DOMAINS}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "100"
+
+  php-fpm:
+    build: ./php
+    container_name: php-fpm
+    volumes:
+      - ./sites:/srv
+      - ./php/php.ini:/usr/local/etc/php/php.ini:ro
+    networks:
+      - appnetwork
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "100"
+
+networks:
+  appnetwork:
+    driver: bridge

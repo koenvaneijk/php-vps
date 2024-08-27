@@ -1,0 +1,14 @@
+(common) {
+    encode gzip
+    tls {
+        dns cloudflare {$CLOUDFLARE_API_TOKEN}
+        resolvers 1.1.1.1
+    }
+}
+
+{$DOMAINS} {
+    import common
+    root * /srv/{host}/public
+    php_fastcgi php-fpm:9000
+    file_server
+}

@@ -6,3 +6,7 @@ RUN xcaddy build \
 # Stage 2: Copy the Caddy binary to a new image
 FROM caddy:2-alpine
 COPY --from=caddy-builder /usr/bin/caddy /usr/bin/caddy
+
+# Create a non-root user
+RUN adduser -D -u 10000 caddy
+USER caddy

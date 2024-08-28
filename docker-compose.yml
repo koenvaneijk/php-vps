@@ -10,7 +10,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy_data:/data
       - ./caddy_config:/config
-      - ./sites:/srv
+      - ./sites:/srv:ro
     networks:
       - appnetwork
     environment:
@@ -21,6 +21,13 @@ services:
       options:
         max-size: "10m"
         max-file: "100"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
 
   php-fpm:
     build: ./php
@@ -36,6 +43,11 @@ services:
       options:
         max-size: "10m"
         max-file: "100"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    cap_drop:
+      - ALL
 
 networks:
   appnetwork:

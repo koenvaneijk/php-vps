@@ -2,6 +2,7 @@ services:
   caddy:
     build: ./caddy
     container_name: caddy
+    restart: always
     ports:
       - "80:80"
       - "443:443"
@@ -24,6 +25,7 @@ services:
   php-fpm:
     build: ./php
     container_name: php-fpm
+    restart: always
     volumes:
       - ./sites:/srv
       - ./php/php.ini:/usr/local/etc/php/php.ini:ro

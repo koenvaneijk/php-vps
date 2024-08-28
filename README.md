@@ -110,9 +110,20 @@ To add a new domain:
 - Edit the .env and add the domain
 - Restart Caddy with `docker restart caddy`
 
+## Misc: add Aider to `.bashrc`
+```
+export OPENAI_API_KEY=your_openai_api_key_here
+export ANTHROPIC_API_KEY=your_anthropic_api_key_here
 
-
-## License
+aider() {
+    docker run -it --rm \
+        --user $(id -u):$(id -g) \
+        --volume "$(pwd)":/app \
+        --env OPENAI_API_KEY \
+        --env ANTHROPIC_API_KEY \
+        paulgauthier/aider "$@"
+}
+```
 
 ## License
 
@@ -141,3 +152,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+
+

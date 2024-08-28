@@ -48,6 +48,38 @@ if ! command_exists docker; then
     exec sudo su -l $USER
 fi
 
+# Check if the system is Ubuntu and offer to set up automatic updates
+if [ -f /etc/lsb-release ] && grep -q "Ubuntu" /etc/lsb-release; then
+    read -p "Do you want to enable automatic updates for Ubuntu? (y/n) " enable_updates
+    if [ "$enable_updates" = "y" ]; then
+        echo -e "${YELLOW}Setting up automatic updates for Ubuntu...${NC}"
+        sudo apt-get update
+        sudo apt-get install -y unattended-upgrades
+        
+        # Configure unattended-upgrades
+        sudo tee /etc/apt/apt.conf.d/20auto-upgrades > /dev/null <<EOT
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+EOT
+
+        # Set up weekly upgrades and reboot
+        echo -e "${YELLOW}Setting up weekly upgrades and reboot...${NC}"
+        sudo tee /etc/cron.weekly/auto-upgrade-reboot > /dev/null <<EOT
+#!/bin/bash
+apt-get update
+apt-get upgrade -y
+apt-get autoremove -y
+reboot
+EOT
+
+        sudo chmod +x /etc/cron.weekly/auto-upgrade-reboot
+        
+        echo -e "${GREEN}Automatic updates have been enabled. The system will update and reboot weekly.${NC}"
+    else
+        echo -e "${YELLOW}Automatic updates not enabled. You can set this up manually later if needed.${NC}"
+    fi
+fi
+
 # Set up .env file
 echo -e "${YELLOW}Setting up .env file...${NC}"
 read -p "Enter your Cloudflare API token: " cf_token

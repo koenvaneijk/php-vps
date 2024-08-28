@@ -21,6 +21,7 @@ For individual developers and small teams, this solution offers an accessible wa
 - 🐳 Docker-based setup for easy deployment and scaling
 - 🔒 Wildcard SSL support
 - 📊 Efficient logging configuration
+- 🔄 Optional automatic updates and weekly upgrades/reboots for Ubuntu systems
 
 ## Prerequisites
 
@@ -56,6 +57,8 @@ To use the script:
    ```
 
 4. Follow the on-screen instructions to complete the setup.
+
+5. If you're using Ubuntu, you'll be given the option to enable automatic updates and weekly upgrades/reboots for enhanced security and maintenance.
 
 ## Manual Setup
 

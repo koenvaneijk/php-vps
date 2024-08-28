@@ -125,6 +125,16 @@ aider() {
 }
 ```
 
+## AI dev workflow for a new app
+- Create folder in `sites` with the domain name (e.g. `subdomain.example.com`)
+- `cp instructions.txt ./sites/subdomain.example.com`
+- `cd ./sites/subdomain.example.com`
+- `aider`
+- `/add instructions.txt`
+- Prompt away!
+
+Optionally you can work in e.g. subdomain-dev.example.com and to deploy to 'production' just copy the folder to the production domain.
+
 ## License
 
 This project is open source and available under the MIT License.

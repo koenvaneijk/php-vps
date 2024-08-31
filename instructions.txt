@@ -50,9 +50,8 @@ project_root/
 
 
 ## Authentication
-- Use Google Sign-In for user authentication. Put placeholder values for the client ID and API key in `index.php`.
-
-Add the Google Sign-In library to your HTML file:
+- Use Google Sign-In for user authentication. Implement this in a file called `auth.php` to handle this.
+- Add the Google Sign-In library to your PHP file:
 
 ```html
 <script src="https://accounts.google.com/gsi/client" async defer></script>
